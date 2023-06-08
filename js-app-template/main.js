@@ -21,7 +21,7 @@ const db = getFirestore(app);
 page('/', () => render(homeTemplate(html), document.body));
 page('/login', () => render(loginTemplate(html), document.body));
 page('/register', () => render(registerTemplate(html), document.body));
-page('/catalog', (ctx) => render(catalogTemplate(html, querySnapshot, ctx), document.body));
+page('/catalog', (ctx) => render(catalogTemplate(html, ctx), document.body));
 page('/catalog/:id', async (ctx) => render(await itemTemplate(html, ctx, doc, getDoc, db), document.body));
 page();
 
