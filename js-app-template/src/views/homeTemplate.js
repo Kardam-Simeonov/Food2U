@@ -10,9 +10,9 @@ function homeTemplate() {
   }
 
   return layoutTemplate(html`
-    <div class="relative">
-      <div class="absolute z-10 text-white h-[34rem] w-[55%] flex flex-col justify-center">
-        <div class="absolute bg-red-500 h-full w-[80%] w-96 left-0 top-0"></div>
+    <div class="relative h-[85vh]">
+      <div class="absolute z-10 text-white h-full w-[55%] flex flex-col justify-center">
+        <div class="absolute bg-red-500 h-full w-[80%] left-0 top-0"></div>
         <div class="absolute bg-red-500 h-full w-96 right-0 top-0 transform skew-x-[-20deg]"></div>
         <div class="pl-12 relative">
           <h1 class="text-5xl mb-2 drop-shadow-lg">Shop Local, Support Local</h1>
@@ -25,7 +25,7 @@ function homeTemplate() {
           </div>
         </div>
       </div>
-      <img class="relative -right-24 z-0 ml-auto h-[34rem]" src="../src/assets/hero_banner.jpg">
+      <img class="relative -right-24 z-0 ml-auto h-full" src="../src/assets/hero_banner.jpg">
     </div>
   `);
 }
