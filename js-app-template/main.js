@@ -16,12 +16,12 @@ import itemTemplate from './src/views/itemTemplate';
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// const querySnapshot = await getDocs(collection(db, "tasks"));
+const querySnapshot = await getDocs(collection(db, "products"));
 
 page('/', () => render(homeTemplate(html), document.body));
 page('/login', () => render(loginTemplate(html), document.body));
 page('/register', () => render(registerTemplate(html), document.body));
-page('/catalog', (ctx) => render(catalogTemplate(html, ctx), document.body));
+page('/catalog', (ctx) => render(catalogTemplate(html, ctx, querySnapshot), document.body));
 page('/catalog/:id', async (ctx) => render(await itemTemplate(html, ctx, doc, getDoc, db), document.body));
 page();
 

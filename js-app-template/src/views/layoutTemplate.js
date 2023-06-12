@@ -18,7 +18,7 @@ function layoutTemplate(content) {
         </div>
       </nav>
     </header>
-    <main class="relative">
+    <main>
       ${content}
     </main>
   `;
