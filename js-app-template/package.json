@@ -13,6 +13,7 @@
     "firebase": "^9.22.2",
     "iconify-icon": "^1.0.7",
     "lit-html": "^2.7.3",
+    "ol": "^7.4.0",
     "page": "^1.11.6"
   },
   "devDependencies": {

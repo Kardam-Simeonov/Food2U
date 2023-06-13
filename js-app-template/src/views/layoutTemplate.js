@@ -5,7 +5,7 @@ import 'iconify-icon';
 function layoutTemplate(content) {
 
   function handleRedirect(){
-    page('/');
+    page.redirect('/');
   }
 
   return html`

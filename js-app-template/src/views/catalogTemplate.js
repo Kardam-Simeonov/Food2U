@@ -1,12 +1,11 @@
 import page from "page";
-import layoutTemplate from '../views/layoutTemplate.js';
+import catalogLayoutTemplate from '../views/catalogLayoutTemplate.js';
 
-function catalogTemplate(html, ctx, querySnapshot, userLocation) {
+function catalogTemplate(html, ctx, querySnapshot) {
 
     if (userLocation == null) {
         page('/');
     }
-
 
     const arr = [];
 
@@ -16,8 +15,31 @@ function catalogTemplate(html, ctx, querySnapshot, userLocation) {
 
     function itemDetailsHandler(id) {
         return function () {
-            page.redirect('/catalog/' + id)
+            page('/catalog/' + id)
         }
+    }
+
+    const itemCatalogTemplate = (doc) => {
+        const distance = calculateDistance(userLocation.coords, doc.Location);
+        return html`
+            <div class="grid grid-cols-12 bg-white hover:bg-gray-100 h-40 rounded-xl shadow-lg max-w-4xl text-gray-700 cursor-pointer" @click=${itemDetailsHandler(doc.id)} id=${doc.id}>
+                <img class="col-span-4 object-cover object-center w-full h-40 rounded-l-xl" src="${doc.ImageURL}">
+                <div class="col-span-8 flex flex-col pt-4 pb-2 px-4">
+                    <h1 class="text-xl font-semibold mb-2">${doc.Title}</h1>
+                    <span class="flex gap-2">
+                        <img class="w-8 aspect-square rounded-full object-cover object-center" src="../src/assets/profile.jpg">
+                        <p class="font-semibold">Ivan</p>    
+                    </span>
+                    <span class="flex justify-between mt-auto">
+                        <p class="text-xl font-bold">£${doc.Price.toFixed(2)}</p>
+                        <div class="flex items-center gap-2">
+                            <iconify-icon icon="fa6-solid:location-arrow" class="text-gray-600 text-lg"></iconify-icon> 
+                            <p>${distance.toFixed(1)} km away</p>
+                        </div>
+                    </span>
+                </div>
+            </div>
+        `;
     }
 
     function calculateDistance(location1, location2) {
@@ -38,35 +60,7 @@ function catalogTemplate(html, ctx, querySnapshot, userLocation) {
         return deg * (Math.PI / 180)
     }
 
-    const itemCatalogTemplate = (doc) => {
-        const distance = calculateDistance(userLocation.coords, doc.Location);
-        return html`
-            <div class="grid grid-cols-12 bg-white h-40 rounded-xl shadow-lg max-w-4xl text-gray-700" @click=${itemDetailsHandler(doc.id)} id=${doc.id}>
-                <img class="col-span-4 object-cover object-center w-full h-40 rounded-l-xl" src="${doc.ImageURL}">
-                <div class="col-span-8 flex flex-col pt-4 pb-2 px-4">
-                    <h1 class="text-xl font-semibold mb-2">${doc.Title}</h1>
-                    <span class="flex gap-2">
-                        <img class="w-8 aspect-square rounded-full object-cover object-center" src="../src/assets/profile.jpg">
-                        <p class="font-semibold">Ivan</p>    
-                    </span>
-                    <span class="flex justify-between mt-auto">
-                        <p class="text-xl font-bold">£${doc.Price.toFixed(2)}</p>
-                        <div class="flex items-center gap-2">
-                            <iconify-icon icon="fa6-solid:location-arrow" class="text-gray-600 text-lg"></iconify-icon> 
-                            <p>${distance.toFixed(1)} km away</p>
-                        </div>
-                    </span>
-                </div>
-            </div>
-        `;
-    }
-
-    // return html`
-    // <h1>Catalog Page</h1>
-    // ${arr.map((doc) => itemCatalogTemplate(doc))}
-    // `
-
-    return layoutTemplate(html`
+    return catalogLayoutTemplate(html`
     <section class="grid grid-cols-12">
         <aside class="col-span-4 bg-[url('../src/assets/catalog_banner.jpg')] h-screen bg-cover brightness-75 sticky top-0"></aside>
         <div class="col-start-5 col-span-8 bg-red-500 h-full px-8 py-12 flex flex-col">
