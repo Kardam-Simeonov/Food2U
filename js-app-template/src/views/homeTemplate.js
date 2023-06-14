@@ -1,8 +1,7 @@
-import { html } from 'lit-html';
+import { LitElement, html } from 'lit';
 import page from 'page';
-import layoutTemplate from '../views/layoutTemplate.js';
+import { TWStyles } from '../../tw.js';
 import 'iconify-icon';
-
 
 export class HomeView extends LitElement {
 
@@ -10,15 +9,29 @@ export class HomeView extends LitElement {
     userAddress: {},
   };
 
+  static styles = TWStyles;
+
   constructor() {
     super();
-    this.userAddress = 'Voenna Rampa 2, 1618 Sofia, Bulgaria';
+    this.userAddress = '';
   }
 
   async getUserAddress() {
-    const userLocation = await navigator.geolocation.getCurrentPosition();
+    let userLocation = {};
+
+    try {
+      userLocation = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject);
+      });
+    }
+    catch (error) {
+      console.log(error);
+      return '';
+    }
 
     const address = await getAddressFromLatLon(userLocation.coords.latitude, userLocation.coords.longitude);
+
+    console.log(address);
 
     async function getAddressFromLatLon(lat, lon) {
       const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`);
@@ -33,31 +46,51 @@ export class HomeView extends LitElement {
     return address;
   }
 
-  handleRedirect() {
-    page('/catalog');
+  // handleRedirect() {
+  //   page('/catalog');
+  // }
+
+
+  connectedCallback() {
+    super.connectedCallback();
+
+    this.getUserAddress().then((address) => {
+      this.userAddress = address;
+    });
   }
 
   render() {
-    return html `
-    <div class="relative h-[85vh]">
-      <div class="absolute z-10 text-white h-full w-[55%] flex flex-col justify-center">
-        <div class="absolute bg-red-500 h-full w-[80%] left-0 top-0"></div>
-        <div class="absolute bg-red-500 h-full w-96 right-0 top-0 transform skew-x-[-20deg]"></div>
-        <div class="pl-12 relative">
-          <h1 class="text-5xl mb-2 drop-shadow-lg">Shop Local, Support Local</h1>
-          <h2 class="text-lg mb-6 drop-shadow-lg">Order food directly from local suppliers</h2>
-          <div class="relative w-2/3">
-            <input type="text" name="search" id="search" class="w-full block p-4 pr-10 rounded-md shadow-sm text-black sm:text-sm" placeholder="Enter your location..." value="${this.userAddress}">
-            <span @click="${handleRedirect}" class="absolute inset-y-0 right-0 flex items-center pr-3 text-2xl text-gray-600 hover:text-black cursor-pointer">
-              <iconify-icon icon="material-symbols:send-rounded"></iconify-icon>
-            </span>
+    return html`
+    <header class="px-16 py-6">
+      <nav class="flex justify-between">
+        <span @click="${() => page('/')}" class="text-red-700 hover:text-red-500 cursor-pointer text-4xl font-bold" style="font-family: calibri;">Food2U</span>
+        <div class="flex items-center gap-2 cursor-pointer"  @click="${() => page('/dashboard')}">
+          <span class="font-semibold">Login as a Supplier</span>
+          <iconify-icon icon="material-symbols:login-rounded" class="text-2xl"></iconify-icon>
+        </div>
+      </nav>
+    </header>
+    <main>
+      <div class="relative h-[85vh]">
+        <div class="absolute z-10 text-white h-full w-[55%] flex flex-col justify-center">
+          <div class="absolute bg-red-500 h-full w-[80%] left-0 top-0"></div>
+          <div class="absolute bg-red-500 h-full w-96 right-0 top-0 transform skew-x-[-20deg]"></div>
+          <div class="pl-12 relative">
+            <h1 class="text-5xl mb-2 drop-shadow-lg">Shop Local, Support Local</h1>
+            <h2 class="text-lg mb-6 drop-shadow-lg">Order food directly from local suppliers</h2>
+            <div class="relative w-2/3">
+              <input type="text" name="search" id="search" class="w-full block p-4 pr-10 rounded-md shadow-sm text-black sm:text-sm" placeholder="Enter your location..." value="${this.userAddress}">
+              <span @click="${() => page('/catalog')}" class="absolute inset-y-0 right-0 flex items-center pr-3 text-2xl text-gray-600 hover:text-black cursor-pointer">
+                <iconify-icon icon="material-symbols:send-rounded"></iconify-icon>
+              </span>
+            </div>
           </div>
         </div>
+        <img class="relative -right-24 z-0 ml-auto h-full" src="../src/assets/hero_banner.jpg">
       </div>
-      <img class="relative -right-24 z-0 ml-auto h-full" src="../src/assets/hero_banner.jpg">
-    </div>
+    </main>
   `;
   }
 }
 
-customElements.define('home-view', HomeView);
+customElements.define('home-template', HomeView);
