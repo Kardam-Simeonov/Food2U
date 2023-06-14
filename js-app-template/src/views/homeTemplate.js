@@ -4,7 +4,7 @@ import layoutTemplate from '../views/layoutTemplate.js';
 import 'iconify-icon';
 
 
-class HomeTemplate extends LitElement {
+export class HomeView extends LitElement {
 
   static properties = {
     userAddress: {},
@@ -15,29 +15,27 @@ class HomeTemplate extends LitElement {
     this.userAddress = 'Voenna Rampa 2, 1618 Sofia, Bulgaria';
   }
 
-  // const userLocation = await getLocation();
+  async getUserAddress() {
+    const userLocation = await navigator.geolocation.getCurrentPosition();
 
-  // function getLocation() {
-  //   return new Promise((resolve, reject) => {
-  //     navigator.geolocation.getCurrentPosition(resolve, reject);
-  //   });
-  // }
+    const address = await getAddressFromLatLon(userLocation.coords.latitude, userLocation.coords.longitude);
 
-  // const userAddress = await getAddressFromLatLon(userLocation.coords.latitude, userLocation.coords.longitude);
+    async function getAddressFromLatLon(lat, lon) {
+      const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`);
+      const data = await response.json();
+      if (data.address) {
+        return `${data.address.road} ${data.address.house_number}, ${data.address.postcode} ${data.address.city}`;
+      } else {
+        throw new Error('Unable to get address from latitude and longitude');
+      }
+    }
 
-  // async function getAddressFromLatLon(lat, lon) {
-  //   const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`);
-  //   const data = await response.json();
-  //   if (data.address) {
-  //     return `${data.address.road} ${data.address.house_number}, ${data.address.postcode} ${data.address.city}`;
-  //   } else {
-  //     throw new Error('Unable to get address from latitude and longitude');
-  //   }
-  // }
+    return address;
+  }
 
-  // function handleRedirect() {
-  //   page('/catalog');
-  // }
+  handleRedirect() {
+    page('/catalog');
+  }
 
   render() {
     return html `
@@ -62,4 +60,4 @@ class HomeTemplate extends LitElement {
   }
 }
 
-export default HomePage;
+customElements.define('home-view', HomeView);
