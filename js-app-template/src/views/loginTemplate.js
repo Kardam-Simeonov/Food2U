@@ -13,16 +13,36 @@ export class LoginView extends LitElement {
       email: { type: String },
       password: { type: String },
       error: { type: String },
-      auth: { type: Object }, // Define the auth property
+      auth: { type: Object }, 
     };
   }
 
-  constructor({ auth }) {
+  constructor(auth) {
     super();
     this.email = '';
     this.password = '';
     this.error = '';
     this.auth = auth;
+  }
+
+  handleEmailInput(event) {
+    this.email = event.target.value;
+  }
+
+  handlePasswordInput(event) {
+    this.password = event.target.value;
+  }
+
+  handleLogin() {
+    signInWithEmailAndPassword(this.auth, this.email, this.password)
+      .then((userCredential) => {
+        setUserCredentials(userCredential);
+        console.log(userCredential)
+        page('/dashboard');
+      })
+      .catch((error) => {
+        this.error = error.message;
+      });
   }
 
   render() {
@@ -57,28 +77,12 @@ export class LoginView extends LitElement {
               Login
             </button>
           </div>
+          <div class="text-center mt-4">
+            <p>Don't have an account? <span class="underline hover:no-underline cursor-pointer font-semibold" @click="${() => page('/register')}">Sign up</span></p>
+          </div>
         </div>
       </div>
     `;
-  }
-
-  handleEmailInput(event) {
-    this.email = event.target.value;
-  }
-
-  handlePasswordInput(event) {
-    this.password = event.target.value;
-  }
-
-  handleLogin() {
-    signInWithEmailAndPassword(this.auth, this.email, this.password)
-      .then((userCredential) => {
-        setUserCredentials(userCredential);
-        page('/dashboard');
-      })
-      .catch((error) => {
-        this.error = error.message;
-      });
   }
 }
 

@@ -46,13 +46,37 @@ export class HomeView extends LitElement {
     return address;
   }
 
-  // handleRedirect() {
-  //   page('/catalog');
-  // }
+  async handleSearch() {
+    console.log(this.userAddress);
+    const addressInput = this.shadowRoot.querySelector('#search');
+    try {
+      const { lat, lon } = await this.getCoordinatesFromAddress(this.userAddress);
+      // Redirect to /catalog with the latitude and longitude as URL parameters
+      page(`/catalog?lat=${lat}&lon=${lon}`);
+    } catch (error) {
+      addressInput.setCustomValidity('Please enter a valid address');
+      addressInput.reportValidity();
+    }
+  }
+  
+  async getCoordinatesFromAddress(address) {
+    const encodedAddress = encodeURIComponent(address);
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodedAddress}&format=json&limit=1`;
+    const response = await fetch(url);
+    const data = await response.json();
+    if (data.length > 0) {
+      return {
+        lat: data[0].lat,
+        lon: data[0].lon,
+      };
+    } else {
+      addressInput.setCustomValidity('Please enter a valid address');
+      addressInput.reportValidity();
+    }
+  }
 
-
-  connectedCallback() {
-    super.connectedCallback();
+  firstUpdated() {
+    super.firstUpdated();
 
     this.getUserAddress().then((address) => {
       this.userAddress = address;
@@ -64,7 +88,7 @@ export class HomeView extends LitElement {
     <header class="px-16 py-6">
       <nav class="flex justify-between">
         <span @click="${() => page('/')}" class="text-red-700 hover:text-red-500 cursor-pointer text-4xl font-bold" style="font-family: calibri;">Food2U</span>
-        <div class="flex items-center gap-2 cursor-pointer"  @click="${() => page('/dashboard')}">
+        <div class="flex items-center gap-2 cursor-pointer"  @click="${() => page('/login')}">
           <span class="font-semibold">Login as a Supplier</span>
           <iconify-icon icon="material-symbols:login-rounded" class="text-2xl"></iconify-icon>
         </div>
@@ -79,8 +103,8 @@ export class HomeView extends LitElement {
             <h1 class="text-5xl mb-2 drop-shadow-lg">Shop Local, Support Local</h1>
             <h2 class="text-lg mb-6 drop-shadow-lg">Order food directly from local suppliers</h2>
             <div class="relative w-2/3">
-              <input type="text" name="search" id="search" class="w-full block p-4 pr-10 rounded-md shadow-sm text-black sm:text-sm" placeholder="Enter your location..." value="${this.userAddress}">
-              <span @click="${() => page('/catalog')}" class="absolute inset-y-0 right-0 flex items-center pr-3 text-2xl text-gray-600 hover:text-black cursor-pointer">
+              <input @input="${(event) => this.userAddress = event.target.value}" type="text" name="search" id="search" class="w-full block p-4 pr-10 rounded-md shadow-sm text-black sm:text-sm" placeholder="Enter your address..." value="${this.userAddress}">
+              <span @click="${this.handleSearch}" class="absolute inset-y-0 right-0 flex items-center pr-3 text-2xl text-gray-600 hover:text-black cursor-pointer">
                 <iconify-icon icon="material-symbols:send-rounded"></iconify-icon>
               </span>
             </div>

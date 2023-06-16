@@ -1,89 +1,121 @@
 import page from "page";
 import { LitElement, html } from 'lit';
+import { until } from 'lit-html/directives/until.js';
 import { TWStyles } from '../../tw.js';
+import { collection, getDocs, addDoc, query, where } from "firebase/firestore";
 
 export class CatalogView extends LitElement {
 
     static properties = {
         products: [],
         cart: {},
-        isCartOpen: { type: Boolean }
+        isCartOpen: { type: Boolean },
+        db: { type: Object },
+        lon: { type: Number },
+        lat: { type: Number },
     };
 
     static styles = TWStyles;
 
-    constructor(querySnapshot) {
+    constructor(db, ctx) {
         super();
 
-        this.products = [];
-        querySnapshot.forEach((doc) => {
-            this.products.push({ id: doc.id, ...doc.data() })
-        });
+        this.db = db;
 
         this.cart = {
             items: [],
             total: 0,
         };
-      
-        this.isCartOpen = false;
-    }
 
-    toggleCart() {
-        this.isCartOpen = !this.isCartOpen;
-        this.requestUpdate('isCartOpen');
-    }
-    
-    addToCart(item) {
-        console.log('Event caught!')
-        this.cart.items.push(item);
-        this.cart.total += item.Price;
-        console.log(this.cart)
-        this.requestUpdate('cart');
+        this.products = [];
+        this.isCartOpen = false;
+
+        const query = ctx.querystring.split('&');
+        this.lat = Number(query[0].split('=')[1]);
+        this.lon = Number(query[1].split('=')[1]);
     }
 
     itemCatalogTemplate = (doc) => {
-        // const distance = calculateDistance(userLocation.coords, doc.Location);
+        const vendorPromise = getDocs(query(collection(this.db, 'vendors'), where('VendorUID', '==', doc.VendorUID)))
+            .then((querySnapshot) => {
+                const vendorDoc = querySnapshot.docs[0];
+                return vendorDoc.data();
+            });
 
-        const distance = 0;
         return html`
-            <div class="grid grid-cols-12 bg-white hover:bg-gray-100 h-40 rounded-xl shadow-lg max-w-4xl text-gray-700 cursor-pointer"
-                @click="${() => this.addToCart(doc)}">
+            <div class="grid grid-cols-12 bg-white h-40 rounded-xl shadow-lg max-w-4xl text-gray-700">
                 <img class="col-span-4 object-cover object-center w-full h-40 rounded-l-xl" src="${doc.ImageURL}">
                 <div class="col-span-8 flex flex-col pt-4 pb-2 px-4">
                     <h1 class="text-xl font-semibold mb-2">${doc.Title}</h1>
                     <span class="flex gap-2">
-                        <img class="w-8 aspect-square rounded-full object-cover object-center" src="../src/assets/profile.jpg">
-                        <p class="font-semibold">Ivan</p>    
+                    ${until(
+                        vendorPromise.then((vendorData) => html`
+                        <img class="w-8 aspect-square rounded-full object-cover object-center" src="${vendorData.ImageURL}">
+                        <p class="font-semibold">${vendorData.Username}</p>
+                        `),
+                        html`<p>Loading...</p>`
+                    )}   
                     </span>
                     <span class="flex justify-between mt-auto">
-                        <p class="text-xl font-bold">£${doc.Price.toFixed(2)}</p>
-                        <div class="flex items-center gap-2">
-                            <iconify-icon icon="fa6-solid:location-arrow" class="text-gray-600 text-lg"></iconify-icon> 
-                            <p>${distance.toFixed(1)} km away</p>
-                        </div>
+                        <p class="text-xl font-bold">$${doc.Price.toFixed(2)}</p>
+                        <button class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-500"
+                                @click="${() => this.addToCart(doc)}">Add to cart</button>
                     </span>
                 </div>
             </div>
         `;
     }
 
-    // function calculateDistance(location1, location2) {
-    //     console.log(location1, location2);
-    //     const R = 6371; // Radius of the earth in km
-    //     const dLat = deg2rad(location2._lat - location1.latitude);
-    //     const dLon = deg2rad(location2._long - location1.longitude);
-    //     const a =
-    //         Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    //         Math.cos(deg2rad(location1.latitude)) * Math.cos(deg2rad(location2._lat)) *
-    //         Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    //     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    //     const d = R * c; // Distance in km
-    //     return d;
-    // }
+    async firstUpdated() {
+        super.firstUpdated();
 
-    // function deg2rad(deg) {
-    //     return deg * (Math.PI / 180)
-    // }
+        const querySnapshot = await getDocs(collection(this.db, "products"));
+        querySnapshot.forEach((doc) => {
+            this.products.push(doc.data());
+        });
+
+        this.requestUpdate('products');
+    }
+
+    toggleCart() {
+        if (this.cart.items.length === 0) {
+            return;
+        }
+
+        this.isCartOpen = !this.isCartOpen;
+        this.requestUpdate('isCartOpen');
+    }
+
+    addToCart(item) {
+        this.cart.items.push(item);
+        this.cart.total += item.Price;
+
+        console.log(this.cart);
+        this.requestUpdate('cart');
+    }
+
+    async handleCheckout() {
+        console.log(this.lon);
+        console.log(this.lat);
+
+        const order = {
+            products: this.cart.items,
+            lon: this.lon,
+            lat: this.lat,
+        };
+
+        try {
+            const docRef = await addDoc(collection(this.db, "orders"), order);
+            console.log("Order written with ID: ", docRef.id);
+        } catch (e) {
+            console.error("Error adding order: ", e);
+        }
+
+        this.cart.items = [];
+        this.cart.total = 0;
+        this.isCartOpen = false;
+        this.requestUpdate('cart');
+    }
 
     render() {
         return html`
@@ -91,7 +123,7 @@ export class CatalogView extends LitElement {
                 <nav class="flex justify-between relative">
                     <span @click="${() => page('/')}" class="text-red-700 hover:text-red-500 cursor-pointer text-4xl font-bold" style="font-family: calibri;">Food2U</span>
                     <div class="flex items-center gap-2 p-4 cursor-pointer" @click="${() => this.toggleCart()}">
-                        <span class="font-semibold">${this.cart.total == 0 ? 'Your cart' : '£' + this.cart.total.toFixed(2)}</span>
+                        <span class="font-semibold">${this.cart.total == 0 ? 'Your cart' : '$' + this.cart.total.toFixed(2)}</span>
                         <iconify-icon icon="material-symbols:shopping-cart" class="text-2xl"></iconify-icon>
                     </div>
                     ${this.isCartOpen ? html`
@@ -103,13 +135,17 @@ export class CatalogView extends LitElement {
                                 <div class="col-span-8 flex flex-col pt-4 pb-2 px-4">
                                     <h1 class="text-xl font-semibold mb-2">${item.Title}</h1>
                                     <span class="flex justify-end mt-auto">
-                                        <p class="text-xl font-bold">£${item.Price.toFixed(2)}</p>
+                                        <p class="text-xl font-bold">$${item.Price.toFixed(2)}</p>
                                     </span>
                                 </div>
                             </div>
                             `)}
                             </div>
-                            <div class="font-bold text-xl text-right w-full">Total: £${this.cart.total.toFixed(2)}</div>
+                            <div class="flex justify-between items-center">
+                                <div class="font-bold text-xl w-full">Total: $${this.cart.total.toFixed(2)}</div>
+                                <button class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-500"
+                                        @click="${() => this.handleCheckout()}">Checkout</button>
+                            </div>
                         </div>
                     ` : ''}
                 </nav>
