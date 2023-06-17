@@ -601,10 +601,6 @@ video {
   grid-column: 1 / -1;
 }
 
-.col-span-12 {
-  grid-column: span 12 / span 12;
-}
-
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -706,12 +702,16 @@ video {
   height: 14rem;
 }
 
-.h-\\[85vh\\] {
-  height: 85vh;
+.h-\\[50vh\\] {
+  height: 50vh;
 }
 
-.h-\\[90vh\\] {
-  height: 90vh;
+.h-\\[70vh\\] {
+  height: 70vh;
+}
+
+.h-\\[85vh\\] {
+  height: 85vh;
 }
 
 .h-full {
@@ -720,26 +720,6 @@ video {
 
 .h-screen {
   height: 100vh;
-}
-
-.h-\\[\\] {
-  height: ;
-}
-
-.h-\\[60vh\\] {
-  height: 60vh;
-}
-
-.h-\\[50vh\\] {
-  height: 50vh;
-}
-
-.h-\\[40vh\\] {
-  height: 40vh;
-}
-
-.h-\\[70vh\\] {
-  height: 70vh;
 }
 
 .min-h-\\[15rem\\] {
@@ -817,20 +797,12 @@ video {
           appearance: none;
 }
 
-.grid-cols-12 {
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-}
-
-.grid-cols-3 {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
 .grid-cols-1 {
   grid-template-columns: repeat(1, minmax(0, 1fr));
 }
 
-.grid-cols-2 {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+.grid-cols-12 {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
 }
 
 .flex-col {
@@ -1030,11 +1002,6 @@ video {
 .py-6 {
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
-}
-
-.px-12 {
-  padding-left: 3rem;
-  padding-right: 3rem;
 }
 
 .pb-2 {
@@ -1260,10 +1227,6 @@ video {
 }
 
 @media (min-width: 640px) {
-  .sm\\:grid-cols-2 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .sm\\:text-sm {
     font-size: 0.875rem;
     line-height: 1.25rem;
@@ -1271,10 +1234,6 @@ video {
 }
 
 @media (min-width: 768px) {
-  .md\\:grid-cols-3 {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
   .md\\:grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1288,10 +1247,6 @@ video {
 @media (min-width: 1024px) {
   .lg\\:col-span-8 {
     grid-column: span 8 / span 8;
-  }
-
-  .lg\\:col-span-4 {
-    grid-column: span 4 / span 4;
   }
 
   .lg\\:ml-0 {
@@ -1312,10 +1267,6 @@ video {
 
   .lg\\:w-\\[80\\%\\] {
     width: 80%;
-  }
-
-  .lg\\:grid-cols-4 {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .lg\\:grid-cols-3 {
@@ -1342,16 +1293,12 @@ video {
     grid-column: span 8 / span 8;
   }
 
-  .xl\\:h-full {
-    height: 100%;
-  }
-
   .xl\\:h-\\[90vh\\] {
     height: 90vh;
   }
 
-  .xl\\:grid-cols-5 {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+  .xl\\:h-full {
+    height: 100%;
   }
 }
  `
