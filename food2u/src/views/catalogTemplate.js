@@ -119,7 +119,7 @@ export class CatalogView extends LitElement {
 
     render() {
         return html`
-            <header class="px-16 py-6">
+            <header class="lg:px-16 px-4 py-6">
                 <nav class="flex justify-between relative">
                     <span @click="${() => page('/')}" class="text-red-700 hover:text-red-500 cursor-pointer text-4xl font-bold" style="font-family: calibri;">Food2U</span>
                     <div class="flex items-center gap-2 p-4 cursor-pointer" @click="${() => this.toggleCart()}">
@@ -152,9 +152,9 @@ export class CatalogView extends LitElement {
             </header>
             <main>
                 <section class="grid grid-cols-12">
-                    <aside class="col-span-4 bg-[url('../src/assets/catalog_banner.jpg')] h-screen bg-cover brightness-75 sticky top-0"></aside>
-                    <div class="col-start-5 col-span-8 bg-red-500 h-full px-8 py-12 flex flex-col">
-                        <h1 class="text-3xl font-bold mb-12 text-white">Showing ${this.products.length} offers in your area</h1>
+                    <aside class="lg:block hidden col-span-4 bg-[url('../src/assets/catalog_banner.jpg')] h-screen bg-cover brightness-75 sticky top-0"></aside>
+                    <div class="lg:col-span-8 col-span-full bg-red-500 h-screen px-8 py-12 flex flex-col">
+                        <h1 class="text-3xl font-bold mb-12 text-white">Showing ${this.products.length} offer${this.products.length > 1 ? 's' : ''} in your area</h1>
                         <div class="flex flex-col gap-4">
                             ${this.products.map((doc) => this.itemCatalogTemplate(doc))}
                         </div>

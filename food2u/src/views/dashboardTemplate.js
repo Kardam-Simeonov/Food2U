@@ -178,7 +178,7 @@ export class DashboardView extends LitElement {
 
     render() {
         return html`
-            <header class="px-16 py-6">
+            <header class="lg:px-16 px-4 py-6">
                 <nav class="flex justify-between">
                     <span @click="${() => page('/dashboard')}" class="text-red-700 hover:text-red-500 cursor-pointer text-4xl font-bold" style="font-family: calibri;">Food2U | Vendors</span>
                     <div class="flex items-center gap-3 cursor-pointer"  @click="${this.handleSignOff}">
@@ -188,9 +188,9 @@ export class DashboardView extends LitElement {
                 </nav>
             </header>
             <main>
-                <section class="grid grid-cols-12 h-[90vh]">
-                    <div id="map" class="col-span-8 h-full"></div>
-                    <aside class="col-span-4 bg-red-500 h-full overflow-y-auto px-8 py-12 flex flex-col">
+                <section class="grid grid-cols-12 xl:h-[90vh]">
+                    <div id="map" class="xl:col-span-8 col-span-full xl:h-full h-[50vh]"></div>
+                    <aside class="xl:col-span-4 col-span-full bg-red-500 xl:h-full h-[70vh] overflow-y-auto px-8 py-12 flex flex-col">
                         <h1 class="text-4xl text-white font-semibold mb-12">Your orders</h1>
                         ${this.orders.length === 0 ? html`
                             <div class="border-dashed border-4 border-red-800 rounded-lg p-4 flex flex-col justify-center items-center min-h-[15rem]">
@@ -203,7 +203,7 @@ export class DashboardView extends LitElement {
                         </section>
                 <section class="py-12 text-white">
                     <h1 class="text-4xl font-bold text-center mb-16 text-red-700">Your Products</h1>
-                    <div class="grid grid-cols-3 gap-4 max-w-5xl mx-auto">
+                    <div class="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4 max-w-5xl px-4 mx-auto">
                         ${this.products.map((doc, index) => this.itemCatalogTemplate(doc, index))}
                         <div class="border-dashed border-4 border-red-500 hover:border-red-300 text-red-500 hover:text-red-300 cursor-pointer rounded-lg p-4 flex flex-col justify-center items-center min-h-[23rem]" @click="${() => page('/dashboard/add')}">
                             <iconify-icon icon="bi:plus-circle" class="text-6xl"></iconify-icon>
